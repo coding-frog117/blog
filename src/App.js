@@ -7,7 +7,9 @@ function App() {
   let [title,setTitle]=useState(['겨울 아우터 추천','강남 맛집 추천','크리스마스 축제']);
   let [like, likeChange]=useState([0,0,0]);
   let [modal,setModal]=useState(false);
+  // setModalTitle을 만드는 이유는 title 인덱스에 따라 스위치를 조절해주기 위해서임
   let [modalTitle,setModalTitle]=useState(0);
+  let [inputValue,setInputValue]=useState('');
 
   return ( 
     <div className="App">
@@ -38,21 +40,47 @@ function App() {
       </div> */}
 
       {
-        title.map((a,i)=>{ 
+        title.map((a,i)=>{
+          let date=new Date(); 
           return (
           <div className="list">
             <h4 onClick={()=>{
               setModal(!modal);
-            }}> {title[i]} <span onClick= {()=>{let copy=[...like];
-            copy[i]=copy[i]+1;
-            likeChange(copy[i])
+              setModalTitle(i);
+            }}> {a} <span onClick= {(e)=>{ 
+              e.stopPropagation();           
+              let copy=[...like];
+              copy[i]=copy[i]+1;
+              likeChange(copy);
             }}> 좋아요 </span>{like[i]}
             </h4>
-            <p>11월 11일 발행 빼빼로데이!</p>
+            <p>
+            {/* 날짜 글마다 실시간 반영하는거 모르겠음 */}
+              {/* {date.getYear()}년 {date.getMonth()}월 {date.getDate()}일 {date.getTime()} 작성됨 */}
+            </p>
+            <button onClick={()=>{
+              let titleCopy=[...title];
+              titleCopy.splice(i,1);
+              setTitle(titleCopy);
+            }}>삭제</button>
           </div>
         )
         })
-      }             
+      }     
+{/* 새로운 글 추가 */}
+      <input onChange={(e)=>{
+        setInputValue(e.target.value);
+      }}></input>
+      <button type="button" onClick={(e)=>{
+          // 제목 배열 추가
+          let titleCopy2=[...title];
+          titleCopy2.unshift(inputValue);
+          setTitle(titleCopy2);
+          // 좋아요 배열추가
+          let likeCopy=[...like];
+          likeCopy.unshift(0);
+          likeChange(likeCopy);
+        }} >글발행</button>
 
       {
         modal == true ? <Modal title={title} setTitle={setTitle} color={'skyblue'} modalTitle={modalTitle}></Modal> :null
@@ -66,8 +94,7 @@ function Modal(props){
   return (
     <>
       <div className="modal" style={{background:props.color}}>
-        <h4>{props.title[props.modalTitle]}
-        </h4>
+        <h4>{props.title[props.modalTitle]}</h4>
         <h4>날짜</h4>
         <p>상세내용</p>
       </div>
